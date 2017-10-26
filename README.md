@@ -29,6 +29,9 @@ To report location back to terminal without notifying:
 
 
 ## Building with PyInstaller
+
 pyinstaller main.py --onefile
+
 cp -rfv dist/main ./wifiLocate
+
 sudo make pkg
