@@ -1,10 +1,10 @@
-#wifiGeoLocate
+# wifiGeoLocate
 
-##Initial Setup
+## Initial Setup
 1)  Change the Makefile to correct reverse-domain.
 2)  For notifications, create a script on a webhost to handle notifications.
 
-##Running wifiGeoLocate
+## Running wifiGeoLocate
 Run with Google API key as argument:
 
   -h : Print Help
@@ -28,7 +28,7 @@ To report location back to terminal without notifying:
 ./main.py -k "GoogleAPIKey" -d
 
 
-##Building with PyInstaller
+## Building with PyInstaller
 pyinstaller main.py --onefile
 cp -rfv dist/main ./wifiLocate
 sudo make pkg
