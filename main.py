@@ -14,7 +14,6 @@ from commands import getoutput
 
 __version__ = "1.9.4"
 __author__ = "Forrest Beck"
-__email__ = "forrest.beck@da.org"
 
 googleAPIURL = "https://www.googleapis.com/geolocation/v1/geolocate?key="
 
