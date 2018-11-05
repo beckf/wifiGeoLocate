@@ -4,40 +4,49 @@
 # wifiGeoLocate:  Uses google geolocation services to determine computer location
 #
 
-import urllib
-import urllib2
+import requests
 import socket
 import re
 import json
 import sys, getopt
-from commands import getoutput
+import os
 
-__version__ = "1.9.4"
+__version__ = "1.9.5"
 __author__ = "Forrest Beck"
 
 googleAPIURL = "https://www.googleapis.com/geolocation/v1/geolocate?key="
 
-def collectSerial():
-    serialNumber = getoutput(
-        '/usr/sbin/system_profiler SPHardwareDataType | grep -i "Serial Number" | cut -d ":" -f 2 | tr -d " " ')
-    return serialNumber
 
-def collectHostName():
+def execute_command(cmd):
+    return os.popen(cmd).read()
+
+
+def collect_serial():
+    serial_number = execute_command('/usr/sbin/system_profiler SPHardwareDataType | '
+                                    'grep -i "Serial Number" | cut -d ":" -f 2 | tr -d " " ')
+    return serial_number
+
+
+def collect_hostname():
     host = socket.gethostname()
     return host
 
-def collectNetworks():
-    nearbyNetworks = getoutput(
+
+def collect_networks():
+    nearbyNetworks = execute_command(
         "/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --scan "
         "| grep -v BSSID | sed 's/^ *//' | sed 's/[ \t]*$//' | tr -s ' ' | rev | cut -d' ' -f5,6 | rev")
     return nearbyNetworks
 
+
 def usage():
-    print sys.argv[0] + " -k apiKey -n(doNotify) -u(notifyURL) -K(notifyKey) | -d(display)"
+    print(sys.argv[0] + " -k apiKey -n(doNotify) -u(notifyURL) -K(notifyKey) | -d(display)")
+
 
 def printVer():
-    print __version__
+    print(__version__)
     exit(0)
+
 
 def googleGeolocate(networks, apiKey):
     apiURL = googleAPIURL + apiKey
@@ -48,55 +57,53 @@ def googleGeolocate(networks, apiKey):
                                         for x in
                                         networksFormatted]
                    }
-        print "Wireless Access Points Discovered: " + str(request)
+        print("Wireless Access Points Discovered: " + str(request))
         try:
-            req = urllib2.Request(apiURL)
-            req.add_header('Content-Type', 'application/json')
             data = json.dumps(request)
-            response = urllib2.urlopen(req, data)
-
+            response = requests.post(apiURL, verify=False, json=data)
             if response:
                 return response
         except:
+            print("Cannot contact Google")
             exit(0)
 
+
 def notify(jsonLocation, notifyURL, notifyKey):
-    location = json.loads(jsonLocation.read())
-    print "Google Location Data " + str(location)
-    notifyText = "Serial Number: " + collectSerial() + \
-                 "\nHostname: " + collectHostName() + \
+    location = jsonLocation.json()
+    print("Google Location Data " + str(location))
+    notifyText = "Serial Number: " + collect_serial() + \
+                 "\nHostname: " + collect_hostname() + \
                  "\nAccuracy: " + str(location['accuracy']) + " meter radius" \
                                                               "\nLocation: http://maps.google.com/maps?z=12&t=k&q=loc:" + \
                  str(location['location']['lat']) + "+" + \
                  str(location['location']['lng'])
-    postData = urllib.urlencode({'key': notifyKey,
-                'notifyText': notifyText})
+    postData = {'key': notifyKey,
+                'notifyText': notifyText}
 
     try:
-        req = urllib2.Request(notifyURL, postData)
-        notify = urllib2.urlopen(req)
+        req = requests.post(notifyURL, postData)
     except:
         exit(0)
 
+
 def main(argv):
     try:
-        opts, args = getopt.getopt(argv, 'k:vuhnKd')
+        opts, args = getopt.getopt(argv, 'k:p:u:vhnd')
     except:
         usage()
         sys.exit(2)
 
     for opt, arg in opts:
-
         if opt in ('-k'):
             apiKey = arg
-        elif opt in ('-K'):
+        if opt in ('-p'):
             notifyKey = arg
-        elif opt in ('-u'):
+        if opt in ('-u'):
             notifyURL = arg
-        elif opt in ('-v'):
+        if opt in ('-v'):
             printVer()
             exit(0)
-        elif opt in ('-h'):
+        if opt in ('-h'):
             usage()
             exit(0)
 
@@ -106,12 +113,13 @@ def main(argv):
 
         if opt in ('-n') and apiKey:
             # Display output and notify.
-            googleResponse = googleGeolocate(collectNetworks(), apiKey)
+            googleResponse = googleGeolocate(collect_networks(), apiKey)
             if googleResponse:
                 notify(googleResponse, notifyURL, notifyKey)
         elif opt in ('-d'):
             # Display output without notifying.
-            print json.loads(googleGeolocate(collectNetworks(), apiKey).read())
+            print(json.loads(googleGeolocate(collect_networks(), apiKey).read()))
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])
