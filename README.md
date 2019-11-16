@@ -19,7 +19,7 @@ Run with Google API key as argument:
 
   -d : Display location in STDOUT
   
-  -d : Play Find My Device alert sound at full volume.
+  -a : Play Find My Device alert sound at full volume.
 
   -n : Display location and Notify using -u URL.
 
