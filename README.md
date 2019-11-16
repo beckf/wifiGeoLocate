@@ -47,13 +47,12 @@ To report location back to terminal without notifying:
 Script can be used without building with PyInstaller.  PyInstaller just ensures it will run under different OS versions 
 since the python binary is built in.  Releases above are built with Python 3.6.
 
-`
-pyinstaller main.py --onefile
+`pyinstaller main.py --onefile`
 
-cp -rfv dist/main ./wifiLocate
+`cp -rfv dist/main ./wifiLocate`
 
-sudo make pkg
-`
+`sudo make pkg`
+
 
 ## Sample JAMF Policy
 ![example policy](images/example_policy.png)
