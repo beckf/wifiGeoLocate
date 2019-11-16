@@ -1,7 +1,7 @@
 include /usr/local/share/luggage/luggage.make
 
 TITLE=wifiLocate
-REVERSE_DOMAIN=tld.domain
+REVERSE_DOMAIN=io.github.beckf.wifiLocate
 PAYLOAD=\
 		pack-script-preinstall\
 		pack-usr-local-sbin-wifiLocate\
