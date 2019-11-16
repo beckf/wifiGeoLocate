@@ -41,7 +41,7 @@ def collect_networks():
 
 
 def usage():
-    print(sys.argv[0] + " -k apiKey -n(doNotify) -u(notifyURL) -K(notifyKey) | -d(display)")
+    print(sys.argv[0] + " -k apiKey -n(doNotify) -u(notifyURL) -p(notifyKey) | -d(display)")
 
 
 def printVer():
