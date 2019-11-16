@@ -14,6 +14,8 @@ campus.
 2)  Create a network change triggered policy in JAMF to execute the script (see example below).  It is suggest to scope
 this policy to only computers that are lost using a static group.
 3)  Install latest release of wifiLocate on clients.
+4)  Obtain a Google GeoLocate Key: https://developers.google.com/maps/documentation/geolocation/get-api-key
+
 
 ## Running wifiGeoLocate
 Run with arguments below:
