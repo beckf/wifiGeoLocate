@@ -18,11 +18,13 @@ Run with Google API key as argument:
   -K : Key to Notify Web URL (Required with -n and -u)
 
   -d : Display location in STDOUT
+  
+  -d : Play Find My Device alert sound at full volume.
 
-  -n : Display location and Notify
+  -n : Display location and Notify using -u URL.
 
 To notify of location:
-./main.py -k "GoogleAPIKey" -n -u "https://server.domain.tld/path/to/notify.php" -K "RandomKeyLocatedinNotify.phpPage"
+./main.py -k "GoogleAPIKey" -a -n -u "https://server.domain.tld/path/to/notify.php" -K "RandomKeyLocatedinNotify.phpPage"
 
 To report location back to terminal without notifying:
 ./main.py -k "GoogleAPIKey" -d
