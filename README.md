@@ -37,7 +37,7 @@ Run with arguments below:
   -n : Display location and Notify using -u URL.
 
 To notify of location:
-./main.py -k "GoogleAPIKey" -a -n -u "https://server.domain.tld/path/to/sample_notify.php" -K "RandomKeyLocatedinNotify.phpPage"
+./main.py -k "GoogleAPIKey" -a -n -u "https://server.domain.tld/path/to/sample_notify.php" -p "RandomKeyLocatedinNotify.phpPage"
 
 To report location back to terminal without notifying:
 ./main.py -k "GoogleAPIKey" -d
