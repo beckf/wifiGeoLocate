@@ -11,11 +11,12 @@ import json
 import sys, getopt
 import os
 
-__version__ = "1.9.5"
+
+__version__ = "2.4"
 __author__ = "Forrest Beck"
 
 googleAPIURL = "https://www.googleapis.com/geolocation/v1/geolocate?key="
-
+alertAudio = '/System/Library/PrivateFrameworks/FindMyDevice.framework/Versions/A/Resources/fmd_sound.aiff'
 
 def execute_command(cmd):
     return os.popen(cmd).read()
@@ -52,31 +53,29 @@ def googleGeolocate(networks, apiKey):
     apiURL = googleAPIURL + apiKey
     if networks:
         networksFormatted = re.compile("(.*) (.*)", re.MULTILINE).findall(networks)
-        request = {"consider_ip": "false",
-                   "wifiAccessPoints": [{"macAddress": str(x[0]), "signalStrength": str(x[1]), "signalToNoiseRatio": 0}
+        request = {"considerIp": "false",
+                   "wifiAccessPoints": [{"macAddress": str(x[0]), "signalStrength": int(x[1]), "signalToNoiseRatio": 0}
                                         for x in
                                         networksFormatted]
                    }
         print("Wireless Access Points Discovered: " + str(request))
         try:
             data = json.dumps(request)
-            response = requests.post(apiURL, verify=False, json=data)
+            response = requests.post(apiURL, verify=False, headers={'Content-type': 'application/json'}, data=data)
             if response:
                 return response
         except:
             print("Cannot contact Google")
-            exit(0)
 
 
 def notify(jsonLocation, notifyURL, notifyKey):
     location = jsonLocation.json()
     print("Google Location Data " + str(location))
-    notifyText = "Serial Number: " + collect_serial() + \
-                 "\nHostname: " + collect_hostname() + \
-                 "\nAccuracy: " + str(location['accuracy']) + " meter radius" \
-                                                              "\nLocation: http://maps.google.com/maps?z=12&t=k&q=loc:" + \
-                 str(location['location']['lat']) + "+" + \
-                 str(location['location']['lng'])
+    location_url = "http://maps.google.com/maps?z=12&t=k&q=loc:" + str(location['location']['lat']) + "+" + str(location['location']['lng'])
+    notifyText = "<p>Serial Number: " + collect_serial() + \
+                 "<br />Hostname: " + collect_hostname() + \
+                 "<br />Accuracy: " + str(location['accuracy']) + " meter radius" \
+                 "<br />Location: <a href=\"" + location_url + "\">" + str(location_url) + "</a></p>"
     postData = {'key': notifyKey,
                 'notifyText': notifyText}
 
@@ -88,7 +87,7 @@ def notify(jsonLocation, notifyURL, notifyKey):
 
 def main(argv):
     try:
-        opts, args = getopt.getopt(argv, 'k:p:u:vhnd')
+        opts, args = getopt.getopt(argv, 'k:p:u:vhand')
     except:
         usage()
         sys.exit(2)
@@ -100,13 +99,15 @@ def main(argv):
             notifyKey = arg
         if opt in ('-u'):
             notifyURL = arg
+        if opt in ('-a'):
+            execute_command('osascript -e "set Volume 10"')
+            execute_command('afplay ' + alertAudio)
         if opt in ('-v'):
             printVer()
             exit(0)
         if opt in ('-h'):
             usage()
             exit(0)
-
         if not apiKey:
             usage()
             exit(0)
@@ -116,9 +117,12 @@ def main(argv):
             googleResponse = googleGeolocate(collect_networks(), apiKey)
             if googleResponse:
                 notify(googleResponse, notifyURL, notifyKey)
+            else:
+                print("No Google Response")
+
         elif opt in ('-d'):
             # Display output without notifying.
-            print(json.loads(googleGeolocate(collect_networks(), apiKey).read()))
+            print(json.loads(googleGeolocate(collect_networks(), apiKey.read())))
 
 
 if __name__ == "__main__":
