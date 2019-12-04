@@ -12,7 +12,7 @@ import sys, getopt
 import os
 
 
-__version__ = "2.4"
+__version__ = "2.5"
 __author__ = "Forrest Beck"
 
 googleAPIURL = "https://www.googleapis.com/geolocation/v1/geolocate?key="
@@ -71,7 +71,7 @@ def googleGeolocate(networks, apiKey):
 def notify(jsonLocation, notifyURL, notifyKey):
     location = jsonLocation.json()
     print("Google Location Data " + str(location))
-    location_url = "http://maps.google.com/maps?z=12&t=k&q=loc:" + str(location['location']['lat']) + "+" + str(location['location']['lng'])
+    location_url = "http://maps.google.com/maps?z=12&t=k&q=" + str(location['location']['lat']) + "," + str(location['location']['lng'])
     notifyText = "<p>Serial Number: " + collect_serial() + \
                  "<br />Hostname: " + collect_hostname() + \
                  "<br />Accuracy: " + str(location['accuracy']) + " meter radius" \
